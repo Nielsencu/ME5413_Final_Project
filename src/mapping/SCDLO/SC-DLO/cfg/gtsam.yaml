@@ -1,0 +1,7 @@
+alaserPGO:
+  save_directory: /home
+  save_map: true
+
+  scan_filter_size: 0.2
+  mapviz_filter_size: 0.2
+
