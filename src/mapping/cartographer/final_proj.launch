@@ -1,0 +1,25 @@
+<launch>
+
+  <param name="/use_sim_time" value="true" />
+
+  <node name="cartographer_node" pkg="cartographer_ros"
+      type="cartographer_node" args="
+          -configuration_directory $(find me5413_world)/launch
+          -configuration_basename final_proj.lua"
+      output="screen">
+
+    <remap from="points2" to="/mid/points" />
+    <remap from="imu" to="/imu/data" />
+    <remap from="scan" to="/front/scan" />
+    <remap from="odom" to="/jackal_velocity_controller/odom" />
+  </node>
+
+  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
+      type="cartographer_occupancy_grid_node" args="-resolution 0.02" />
+
+  <node name="rviz" pkg="rviz" type="rviz" required="false"
+      args="-d $(find cartographer_ros)/configuration_files/demo_2d.rviz" />
+  
+  <node name="rosbag" pkg="rosbag" type="play" args="bag_path" output="screen" />
+
+</launch>
