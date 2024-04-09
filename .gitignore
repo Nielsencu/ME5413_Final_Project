@@ -52,4 +52,5 @@ qtcreator-*
 # Catkin custom files
 CATKIN_IGNORE
 
-*.jpg
+/src/me5413_world/src/raw/*
+/src/me5413_world/src/digit_3_templates_unused/*

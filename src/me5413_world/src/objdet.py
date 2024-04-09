@@ -127,9 +127,9 @@ class DigitDetector:
         return twist_msg
     
     @staticmethod
-    def get_roi_template_matching(obs, templates_folder, use_histogram=False):
+    def get_roi_template_matching(obs, templates_folder, use_otsu_thresholding=False):
         candidate = obs
-        if use_histogram:
+        if use_otsu_thresholding:
             thres_candidate = filters.threshold_otsu(obs)
             _, candidate= cv2.threshold(obs,thres_candidate,255,cv2.THRESH_BINARY)
         
@@ -138,10 +138,10 @@ class DigitDetector:
         max_template = None
         for template_dir in os.listdir(templates_folder):
             template = cv2.imread(f'{templates_folder}{template_dir}')
-            
-            template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+            template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)            
+            template = cv2.Canny(template, threshold1 = 50, threshold2 = 150)
             template_saved = template.copy()
-            if use_histogram:
+            if use_otsu_thresholding:
                 thres_template = filters.threshold_otsu(template)
                 _,template = cv2.threshold(template,thres_template,255,cv2.THRESH_BINARY)
 
@@ -273,7 +273,7 @@ class DigitDetector:
                     template_id +=1
                 continue
             
-            max_match_val, max_match_loc, max_template = self.get_detections(obs)
+            max_match_val, max_match_loc, max_template = self.get_detections(th1)
             
             print("Maximum value detected ", max_match_val)
             vel_x, yaw_rate = 0.0, 0.0
@@ -306,10 +306,8 @@ class DigitDetector:
                     rospy.signal_shutdown("Finished navigation")
                     break
                 print(f"Moving to box...")
-                display_template = max_template
                 color = (0,255,0)
             else:
-                display_template = np.zeros(obs.shape)
                 color = (0,0,255)
                 print(f"No detections, rotating on the spot...")
                 yaw_rate = self.SPOT_TURNING_YAW_RATE
@@ -323,7 +321,7 @@ class DigitDetector:
                    1, color, 2, cv2.LINE_AA) 
             
             self.detection_pub.publish(self.bridge.cv2_to_imgmsg(display, encoding="passthrough"))
-            display_lists.append(("template", display_template))
+            display_lists.append(("template", max_template))
             display_lists.append(("obs", display))
             for window_name, image in display_lists:
                 cv2.imshow(window_name, image)

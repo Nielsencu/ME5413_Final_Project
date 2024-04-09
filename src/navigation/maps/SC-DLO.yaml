@@ -1,0 +1,6 @@
+image: ./SC-DLO.pgm
+resolution: 0.02003817558288574
+origin: [-4.884766578674316, -1.2034941911697388, 0]
+occupied_thresh: 0.588
+free_thresh: 0.196
+negate: 0
